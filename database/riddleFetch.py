@@ -3,7 +3,9 @@ import random
 import streamlit as st
 # Function to get a database connection
 def get_db_connection():
-    conn = sqlite3.connect(r'riddles.db')
+    
+    db_path = os.path.join(os.path.dirname(__file__), 'riddles.db')
+    conn = sqlite3.connect(db_path)
     return conn
 
 def add_riddle(question, correct_answer, reasoning_of_answer):
