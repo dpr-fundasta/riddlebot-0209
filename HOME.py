@@ -1,19 +1,24 @@
 import streamlit as st
 import importlib
+
 # from streamlit_chat import message
-from database.riddleFetch import fetch_random_riddle # , add_riddle
+from database.riddleFetch import fetch_random_riddle  # , add_riddle
 from llm.definition import (
-    judge_gemini_chain, 
+    judge_gemini_chain,
     judge_openai_chain,
     hint_gemini_chain,
-    hint_openai_chain
+    hint_openai_chain,
 )
 from llm.promptTemplates import (
-    answer_checking_prompt,
-    hint_generation_prompt
+    answer_checking_prompt_gemini,
+    answer_checking_prompt_chatgpt,
+    hint_generation_prompt,
 )
 import streamlit.components.v1 as components
+
 st.set_page_config(page_title="謎解きゲームチャットボット", page_icon="🧩")
+
+
 # Initialize the session state
 def initialize_session_state():
     if "qcount" not in st.session_state:
@@ -24,18 +29,21 @@ def initialize_session_state():
         st.session_state.riddle_data = fetch_random_riddle()
     if "history" not in st.session_state:
         st.session_state.history = []
-    if "text_input" not in st.session_state: #my code
+    if "text_input" not in st.session_state:  # my code
         st.session_state.text_input = ""
+
 
 # Initialize session state on first load
 initialize_session_state()
 
+
 # Fetch a new riddle and reset history
 def fetch_new_riddle():
-    
+
     st.session_state.riddle_data = fetch_random_riddle()
-    st.session_state.history = [] #commented
+    st.session_state.history = []  # commented
     # st.experimental_rerun()
+
 
 # Main Streamlit interface
 
@@ -81,44 +89,47 @@ st.markdown(
     }
     </style>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 
 # Display the riddle
 def display_riddle():
     riddle = st.session_state.riddle_data
-    st.session_state.history.append({
-        "role": "system",
-        "content": f"Riddle: {riddle['question']}"
-    })
-    #st.write(f"Riddle: {riddle['question']}")
-    st.info(riddle['question'], icon="ℹ️")
-  
+    st.session_state.history.append(
+        {"role": "system", "content": f"Riddle: {riddle['question']}"}
+    )
+    # st.write(f"Riddle: {riddle['question']}")
+    st.info(riddle["question"], icon="ℹ️")
 
 
-
-st.markdown('<h1 class="title">🤖 謎解きチャットボットへようこそ！</h1>', unsafe_allow_html=True)
+st.markdown(
+    '<h1 class="title">🤖 謎解きチャットボットへようこそ！</h1>', unsafe_allow_html=True
+)
 # st.sidebar.title("🧠 LLMモデルを選択してください")
-st.sidebar.markdown('<h3>🧠 LLMモデルを選択してください</h1>', unsafe_allow_html=True)
-model = st.sidebar.radio("モデルを選択してください", ('ChatGPT', 'Gemini'))
+st.sidebar.markdown("<h3>🧠 LLMモデルを選択してください</h1>", unsafe_allow_html=True)
+model = st.sidebar.radio("モデルを選択してください", ("ChatGPT", "Gemini"))
 
 display_riddle()
+
 
 # col1, col2, col = st.columns([1, 1])
 def reload_riddle():
     st.session_state.riddle_data = fetch_random_riddle()
-    st.session_state.history = [] #commented
+    st.session_state.history = []  # commented
 
-with st.form(key='user_resp', border = False ,clear_on_submit=True):
+
+with st.form(key="user_resp", border=False, clear_on_submit=True):
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
-        user_answer = st.text_input("あなた： ", "", placeholder="ここに入力してください...!")
-    
+        user_answer = st.text_input(
+            "あなた： ", "", placeholder="ここに入力してください...!"
+        )
+
     with col2:
         send_button = st.form_submit_button(label="送信")
-        
+
     with col3:
         next_riddle = st.form_submit_button(label="次の謎")
 
@@ -137,34 +148,42 @@ if send_button and user_answer:
     st.session_state.riddle_data["user_answer"] = user_answer
 
     # Choose the LLM model
-    if model == 'ChatGPT':
-        response = judge_openai_chain(answer_checking_prompt, st.session_state.riddle_data)
+    if model == "ChatGPT":
+        response = judge_openai_chain(
+            answer_checking_prompt_chatgpt, st.session_state.riddle_data
+        )
     else:
-        response = judge_gemini_chain(answer_checking_prompt, st.session_state.riddle_data)
-    
+        response = judge_gemini_chain(
+            answer_checking_prompt_gemini, st.session_state.riddle_data
+        )
+
     # result = response['text']['result'] #LangchainDepricated
     # reasoning = response['text']['reasoning'] #LangchainDepricated
-    result = response['result']
-    reasoning = response['reasoning']
+    result = response["result"]
+    reasoning = response["reasoning"]
 
     if result.lower() == "correct":
         st.session_state.acount += 1
-        st.success('正解です！', icon="✅")
+        st.success("正解です！", icon="✅")
         st.success("もう一度挑戦するには「次の謎」を押してください！")
         st.balloons()
         st.session_state.history.append({"role": "assistant", "content": result})
 
     else:
         st.error("❌ 不正解です。ヒントをお教えします。")
-    
-        if model == 'ChatGPT':
-            hint_response = hint_openai_chain(hint_generation_prompt, st.session_state.riddle_data)
+
+        if model == "ChatGPT":
+            hint_response = hint_openai_chain(
+                hint_generation_prompt, st.session_state.riddle_data
+            )
         else:
-            hint_response = hint_gemini_chain(hint_generation_prompt, st.session_state.riddle_data)
-        #hint = hint_response["text"]["hint"] #LangchainDepricated
+            hint_response = hint_gemini_chain(
+                hint_generation_prompt, st.session_state.riddle_data
+            )
+        # hint = hint_response["text"]["hint"] #LangchainDepricated
         hint = hint_response["hint"]
         st.session_state.history.append({"role": "assistant", "content": hint})
-        #st.error(hint_response["text"]["hint"]) #LangchainDepricated
+        # st.error(hint_response["text"]["hint"]) #LangchainDepricated
         st.error(hint_response["hint"])
 
     # Clear the text input box after submission
@@ -196,4 +215,6 @@ st.sidebar.markdown(score_style, unsafe_allow_html=True)
 
 # Display the score
 st.sidebar.markdown("<div class='score-label'>得点：</div>", unsafe_allow_html=True)
-st.sidebar.markdown(f"<div class='score-value'>{a_count} / {q_count}</div>", unsafe_allow_html=True)
+st.sidebar.markdown(
+    f"<div class='score-value'>{a_count} / {q_count}</div>", unsafe_allow_html=True
+)
