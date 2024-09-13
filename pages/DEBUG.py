@@ -11,7 +11,7 @@ sys.path.insert(0, parent_dir)
 try:
 # Import the variable from parent_file
     from HOME import reasoning
-except ImportErrpr:
+except ImportError:
     print("")
 score_style = """
     <style>
