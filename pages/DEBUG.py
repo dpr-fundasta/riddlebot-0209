@@ -1,5 +1,5 @@
 import streamlit as st
-
+from HOME import reasoning
 score_style = """
     <style>
      .score-debug {
