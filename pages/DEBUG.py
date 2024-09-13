@@ -21,6 +21,7 @@ st.write(st.session_state.riddle_data)
 st.write("History")
 st.write(st.session_state.hint_history)
 st.write("Reasoning")
+st.write(reasoning)
 # try:
 
 #     st.write(reasoning)
