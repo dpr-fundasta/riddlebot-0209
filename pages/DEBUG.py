@@ -21,7 +21,14 @@ st.write(st.session_state.riddle_data)
 st.write("History")
 st.write(st.session_state.hint_history)
 st.write("Reasoning")
-st.write(reasoning)
+
+
+try:
+    # Code that may raise an exception
+    st.write(reasoning)
+except NameError:
+    # Code that runs if the exception occurs
+    st.write("Value not set")
 # try:
 
 #     st.write(reasoning)
