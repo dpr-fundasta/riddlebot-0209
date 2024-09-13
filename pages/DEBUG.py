@@ -1,5 +1,16 @@
 import streamlit as st
+
+
+import os
+import sys
+
+# Add parent directory to sys.path
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, parent_dir)
+
+# Import the variable from parent_file
 from HOME import reasoning
+
 score_style = """
     <style>
      .score-debug {
@@ -21,8 +32,6 @@ st.write(st.session_state.riddle_data)
 st.write("History")
 st.write(st.session_state.hint_history)
 st.write("Reasoning")
-
-
 try:
     # Code that may raise an exception
     st.write(reasoning)
