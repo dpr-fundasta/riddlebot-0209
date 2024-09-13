@@ -1,23 +1,24 @@
-import os
 import sqlite3
+import os
 import random
 import streamlit as st
+
 # Function to get a database connection
 def get_db_connection():
-    
+
     db_path = os.path.join(os.path.dirname(__file__), 'riddles.db')
     conn = sqlite3.connect(db_path)
     return conn
 
-def add_riddle(question, correct_answer, reasoning_of_answer):
+def add_riddle(question, correct_answer):
     conn = get_db_connection()
     cursor = conn.cursor()
     
     # Insert the data into the table
     cursor.execute('''
-        INSERT INTO riddles (question, correct_answer, reasoning_of_answer)
-        VALUES (?, ?, ?);
-    ''', (question, correct_answer, reasoning_of_answer))
+        INSERT INTO riddles (question, correct_answer)
+        VALUES (?, ?);
+    ''', (question, correct_answer))
 
     # Commit the changes to the database
     conn.commit()
@@ -41,7 +42,7 @@ def fetch_random_riddle():
 
     # Retrieve the random row from the table
     cursor.execute('''
-        SELECT question, correct_answer, reasoning_of_answer
+        SELECT question, correct_answer
         FROM riddles
         LIMIT 1 OFFSET ?
     ''', (random_row_number,))
@@ -54,14 +55,8 @@ def fetch_random_riddle():
         # Return the result as a dictionary
         return {
             "question": result[0],
-            "correct_answer": result[1],
-            "reasoning_of_answer": result[2]
-        }
+            "correct_answer": result[1]
+            }
     else:
         return None
 
-# Example usage
-# if __name__ == "__main__":
-#     #add_riddle("What has to be broken before you can use it?", "Egg", "An egg must be broken before you can cook with it.")
-#     riddle = fetch_random_riddle()
-#     print(riddle)
