@@ -8,9 +8,11 @@ import sys
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, parent_dir)
 
+try:
 # Import the variable from parent_file
-from HOME import reasoning
-
+    from HOME import reasoning
+except ImportErrpr:
+    print("")
 score_style = """
     <style>
      .score-debug {
