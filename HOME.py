@@ -28,6 +28,8 @@ def initialize_session_state():
         st.session_state.hint_history = []
     if "text_input" not in st.session_state: #my code
         st.session_state.text_input = ""
+    if "reasoning" not in st.session_state:
+        st.session_state.reasoning= ""
 
 # Initialize session state on first load
 initialize_session_state()
@@ -98,6 +100,7 @@ def reload_riddle():
     st.session_state.riddle_data = fetch_random_riddle()
 
     st.session_state.hint_history = []
+    st.session_state.reasoning = ""
 
 with st.form(key='user_resp', border = False ,clear_on_submit=True):
     col1, col2, col3 = st.columns(3)
@@ -129,7 +132,8 @@ if send_button and user_answer:
 
     result = response['result']
     reasoning = response['reasoning']
-    st.write(reasoning)
+    st.session_state.reasoning = reasoning
+    # st.write(reasoning)
     if result.lower() == "correct":
         st.session_state.acount += 1
         st.success('正解です！', icon="✅")

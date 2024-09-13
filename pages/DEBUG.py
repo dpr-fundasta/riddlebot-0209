@@ -1,18 +1,5 @@
 import streamlit as st
 
-
-import os
-import sys
-
-# Add parent directory to sys.path
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, parent_dir)
-
-try:
-# Import the variable from parent_file
-    from HOME import reasoning
-except ImportError:
-    print("")
 score_style = """
     <style>
      .score-debug {
@@ -36,7 +23,7 @@ st.write(st.session_state.hint_history)
 st.write("Reasoning")
 try:
     # Code that may raise an exception
-    st.write(reasoning)
+    st.write(st.session_state.reasoning)
 except NameError:
     # Code that runs if the exception occurs
     st.write("Value not set")
