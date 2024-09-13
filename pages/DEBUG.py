@@ -23,7 +23,7 @@ st.write(st.session_state.hint_history)
 st.write("Reasoning")
 try:
     # Code that may raise an exception
-    st.write(st.session_state.reasoning)
+    st.markdown(f'<p style="color:red;">{st.session_state.reasoning}</p>', unsafe_allow_html=True)
 except NameError:
     # Code that runs if the exception occurs
     st.write("Value not set")
