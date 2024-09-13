@@ -129,7 +129,7 @@ if send_button and user_answer:
 
     result = response['result']
     reasoning = response['reasoning']
-
+    st.write(reasoning)
     if result.lower() == "correct":
         st.session_state.acount += 1
         st.success('正解です！', icon="✅")
